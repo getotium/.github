@@ -1,0 +1,44 @@
+# Reusable Go CI for getotium/* repos. Call it from a repo with an 8-line stub:
+#
+#   jobs:
+#     ci:
+#       uses: getotium/.github/.github/workflows/go-ci.yaml@main
+#
+# Edit the pipeline here once; every repo that references @main picks it up.
+name: Go CI
+
+on:
+  workflow_call:
+    inputs:
+      go-version-file:
+        description: File to read the Go toolchain version from (each repo pins its own).
+        type: string
+        default: go.mod
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: ${{ inputs.go-version-file }}
+      - name: gofmt
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then
+            echo "::error::these files need gofmt:"; echo "$unformatted"; exit 1
+          fi
+      - name: build
+        run: go build ./...
+      - name: vet
+        run: go vet ./...
+      - name: lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+      - name: test
+        run: go test -race -cover ./...
