@@ -36,11 +36,10 @@ jobs:
         run: go build ./...
       - name: vet
         run: go vet ./...
+      # golangci-lint v2 via the official action (v8 = the golangci-lint-v2 major).
       - name: lint
-        # Install golangci-lint with THIS workflow's Go so it's never older than the module's
-        # go directive (a prebuilt binary built with an older Go refuses a newer go.mod).
-        run: |
-          go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
-          "$(go env GOPATH)/bin/golangci-lint" run ./...
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: latest
       - name: test
         run: go test -race -cover ./...
