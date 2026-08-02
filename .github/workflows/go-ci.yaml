@@ -22,8 +22,8 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version-file: ${{ inputs.go-version-file }}
       - name: gofmt
@@ -38,7 +38,7 @@ jobs:
         run: go vet ./...
       # golangci-lint v2 via the official action (v8 = the golangci-lint-v2 major).
       - name: lint
-        uses: golangci/golangci-lint-action@v8
+        uses: golangci/golangci-lint-action@v9
         with:
           version: latest
       - name: test
